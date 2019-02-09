@@ -36,4 +36,45 @@ default_katze = Katze.new()
 \NewDocumentCommand{\sendkatzecommands}{O{3303} O{127.0.0.1}}{%
   \luadirect{default_katze:send_commands(\luastring{#2}, #1)}
 }%
+
+% Isn't there a cleaner way?
+\NewDocumentCommand{\newkatzecommand}{s m O{0} o m O{#5}}{%
+  \IfBooleanTF{#1}{%
+    \IfNoValueTF{#4}{%
+      \newcommand*{#2}[#3]{#5}%
+      \registerkatzecommand*{#2}[#3]{#6}%
+    }{%
+      \newcommand*{#2}[#3][#4]{#5}%
+      \registerkatzecommand*{#2}[#3][#4]{#6}%
+    }%
+  }{%
+    \IfNoValueTF{#4}{%
+      \newcommand{#2}[#3]{#5}%
+      \registerkatzecommand{#2}[#3]{#6}%
+    }{%
+      \newcommand{#2}[#3][#4]{#5}%
+      \registerkatzecommand{#2}[#3][#4]{#6}%
+    }%
+  }%
+}%
+
+\NewDocumentCommand{\renewkatzecommand}{s m O{0} o m O{#5}}{%
+  \IfBooleanTF{#1}{%
+    \IfNoValueTF{#4}{%
+      \renewcommand*{#2}[#3]{#5}%
+      \reregisterkatzecommand*{#2}[#3]{#6}%
+    }{%
+      \renewcommand*{#2}[#3][#4]{#5}%
+      \reregisterkatzecommand*{#2}[#3][#4]{#6}%
+    }%
+  }{%
+    \IfNoValueTF{#4}{%
+      \renewcommand{#2}[#3]{#5}%
+      \reregisterkatzecommand{#2}[#3]{#6}%
+    }{%
+      \renewcommand{#2}[#3][#4]{#5}%
+      \reregisterkatzecommand{#2}[#3][#4]{#6}%
+    }%
+  }%
+}%
 \endinput

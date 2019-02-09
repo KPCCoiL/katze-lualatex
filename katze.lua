@@ -3,7 +3,7 @@ Command.__index = Command
 
 function Command.new(name, allow_par, args, default, body)
   local self = setmetatable({}, Command)
-  self.name = name
+  self.name = name:match("^%s*(.-)%s*$")
   self.args = args
   self.default = default
   self.body = body
