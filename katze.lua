@@ -49,19 +49,6 @@ function Katze.new()
   return self
 end
 
---[[
-function Katze:send_message(addr, port, msg)
-  local connection = socket.connect(addr, port)
-  print(connection:receive())
-  connection:send(msg)
-  for i = 1, 2 do
-    local line = connection:receive()
-    print('Response: ' .. line)
-  end
-  connection:close()
-end
-]]
-
 function Katze:show_error(message)
   local template = "Katze: %s"
   error(template:format(message))
