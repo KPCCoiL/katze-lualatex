@@ -1,10 +1,39 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{katze-math}[2019/02/04 hoge]
+\ProvidesPackage{katze}[2019/02/04 hoge]
 
 \RequirePackage{xparse, luacode}
 
 \begin{luacode*}
-load("katze.lua")
+Katze = require("katze")
+default_katze = Katze.new()
 \end{luacode*}
 
+\newcommand{\booleantolua}[1]{\IfBooleanTF{#1}{true}{false}}
+\newcommand{\existornil}[1]{\IfNoValueTF{#1}{nil}{\luastringN{#1}}}
+
+\NewDocumentCommand{\registerkatzecommand}{>{\ReverseBoolean}s m O{0} o m}{%
+  \luadirect{%
+    default_katze:new_command(
+      \luastringN{#2},
+      \booleantolua{#1},
+      tonumber(\luastringN{#3}),
+      \existornil{#4},
+      \luastringN{#5})
+  }%
+}%
+
+\NewDocumentCommand{\reregisterkatzecommand}{>{\ReverseBoolean}s m O{0} o m }{%
+  \luadirect{%
+    default_katze:renew_command(
+      \luastringN{#2},
+      \booleantolua{#1},
+      tonumber(\luastringN{#3}),
+      \existornil{#4},
+      \luastringN{#5})
+  }%
+}%
+
+\NewDocumentCommand{\sendkatzecommands}{O{3303} O{127.0.0.1}}{%
+  \luadirect{default_katze:send_commands(\luastring{#2}, #1)}
+}%
 \endinput

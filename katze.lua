@@ -1,12 +1,13 @@
 local Command = {}
 Command.__index = Command
 
-function Command.new(name, args, default, body)
+function Command.new(name, allow_par, args, default, body)
   local self = setmetatable({}, Command)
   self.name = name
   self.args = args
   self.default = default
   self.body = body
+  self.allow_par = allow_par
   return self
 end
 
@@ -14,6 +15,7 @@ function Command:to_json()
   local template = [[
   "%s": {
     "name": "%s",
+    "allow_par": "%s",
     "args": %d,
     "has_optional": %s,
     "default": "%s",
@@ -30,6 +32,7 @@ function Command:to_json()
   return template:format(
     self.name,
     self.name,
+    self.allow_par,
     self.args,
     has_opt,
     default,
@@ -69,22 +72,22 @@ function Katze:show_warning(message)
   tex.print(template:format(message))
 end
 
-function Katze:register(name, args, default, body)
+function Katze:register(name, allow_par, args, default, body)
   local is_new = self.commands[name] == nil
-  self.commands[name] = Command.new(name, args, default, body)
+  self.commands[name] = Command.new(name, allow_par, args, default, body)
   return is_new
 end
 
-function Katze:new_command(name, args, default, body)
-  local is_new = self:register(name, args, default, body)
+function Katze:new_command(name, allow_par, args, default, body)
+  local is_new = self:register(name, allow_par, args, default, body)
   if not is_new then
     local message = [[\newkatzecommand{%s}: command %s already defined]]
     self:show_error(message:format(name, name))
   end
 end
 
-function Katze:renew_command(name, args, default, body)
-  local is_new = self:register(name, args, default, body)
+function Katze:renew_command(name, allow_par, args, default, body)
+  local is_new = self:register(name, allow_par, args, default, body)
   if is_new then
     local message = [[\renewkatzecommand{%s}: command %s not defined]]
     self:show_error(message:format(name, name))
@@ -106,4 +109,4 @@ function Katze:send_commands(addr, port)
   client:close()
 end
 
-local default_katze = Katze.new()
+return Katze
