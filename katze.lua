@@ -15,12 +15,12 @@ function Command:to_json()
   local template = [[
   "%s": {
     "name": "%s",
-    "allow_par": "%s",
+    "allow_par": %s,
     "args": %d,
     "has_optional": %s,
-    "default": "%s",
+    "opt_default": "%s",
     "body": "%s"
-  },
+  }
 ]]
   local has_opt
   if self.default ~= nil then
@@ -29,14 +29,17 @@ function Command:to_json()
     has_opt = "false"
   end
   local default = self.default or ""
+  local function double_backslash(str)
+    return str:gsub([[\]], [[\\]])
+  end
   return template:format(
-    self.name,
-    self.name,
+    double_backslash(self.name),
+    double_backslash(self.name),
     self.allow_par,
     self.args,
     has_opt,
-    default,
-    self.body)
+    double_backslash(default),
+    double_backslash(self.body))
 end
 
 
@@ -89,7 +92,12 @@ function Katze:send_commands(addr, port)
     return
   end
   client:send('{\n')
+  local first = true
   for name, command in pairs(self.commands) do
+    if not first then
+      client:send(',')
+    end
+    first = false
     client:send(command:to_json())
   end
   client:send('}\n')
